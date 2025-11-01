@@ -1,4 +1,6 @@
 # Aurora Store
+**(This fork contains GitHub releases.)**
+
 
 Aurora Store enables you to search and download apps from the official Google Play store. You can check app descriptions, screenshots, updates, reviews, and download the APK directly from Google Play to your device. 
 
