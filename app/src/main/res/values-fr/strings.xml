@@ -340,7 +340,7 @@
     <string name="session_login">Connectez-vous à votre compte Google Play</string>
     <string name="add_dispenser_summary">Ajouter un distributeur de jetons à Aurora Store. Les distributeurs de jetons fournissent des identifiants de compte à Aurora Store pour les connexions anonymes.</string>
     <string name="add_dispenser_hint">URL du distributeur de jetons</string>
-    <string name="remove_dispenser_title">Supprimer le distributeur de jetons</string>
+    <string name="remove_dispenser_title">Supprimer le distributeur de jetons ?</string>
     <string name="add">Ajouter</string>
     <string name="pref_dispenser_summary">Consulter et gérer les distributeurs de jetons pour les connexions anonymes</string>
     <string name="no_dispensers_available">Aucun distributeur de jetons n’est proposé</string>
@@ -460,8 +460,16 @@
     <string name="manual_download_version_error">La version du code ne peut comporter que des chiffres</string>
     <string name="preparing_to_install">Préparation de l’installation</string>
     <plurals name="permissions_required">
-        <item quantity="one">Autorisation nécessaire</item>
-        <item quantity="many">Autorisations nécessaires</item>
-        <item quantity="other">Autorisations nécessaires</item>
+        <item quantity="one">Une autorisation est nécessaire</item>
+        <item quantity="many">Des autorisations sont nécessaires</item>
+        <item quantity="other">Des autorisations sont nécessaires</item>
     </plurals>
+    <string name="installer_microg_misconfigured">Le programme d’installation de MicroG n’a pas réussi à installer l’appli, probablement en raison d’une mauvaise configuration.</string>
+    <string name="pref_install_mode_microg">Programme d’installation de MicroG</string>
+    <string name="microg_installer_subtitle">L’appli compagnon microG doit être installée</string>
+    <string name="microg_installer_desc">Vous aide à contourner la vérification de l’intégrité des applis (programme d’installation seulement)</string>
+    <string name="loading">En cours de chargement</string>
+    <string name="page">Page <xliff:g id="number">%1$d</xliff:g></string>
+    <string name="action_skip">Ignorer</string>
+    <string name="force_restart_snack">Redémarrer pour appliquer les changements ?</string>
 </resources>

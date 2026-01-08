@@ -41,6 +41,7 @@ import com.aurora.store.BuildConfig.VERSION_NAME
 import com.aurora.store.R
 import com.aurora.store.compose.composable.LinkListItem
 import com.aurora.store.compose.composable.TopAppBar
+import com.aurora.store.compose.preview.PreviewTemplate
 import com.aurora.store.data.model.Link
 
 @Composable
@@ -76,7 +77,7 @@ private fun ScreenContent(onNavigateUp: () -> Unit = {}, onAboutAurora: () -> Un
         R.drawable.ic_ethereum_eth,
         R.drawable.ic_bhim,
         R.drawable.ic_paypal,
-        R.drawable.ic_libera_pay,
+        R.drawable.ic_libera_pay
     )
 
     val links = linkURLS.mapIndexed { index, url ->
@@ -166,5 +167,7 @@ private fun BrandHeader() {
 @Preview
 @Composable
 private fun AboutScreenPreview() {
-    ScreenContent()
+    PreviewTemplate {
+        ScreenContent()
+    }
 }

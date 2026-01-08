@@ -24,9 +24,14 @@ import com.aurora.store.compose.ui.blacklist.BlacklistScreen
 import com.aurora.store.compose.ui.commons.PermissionRationaleScreen
 import com.aurora.store.compose.ui.details.AppDetailsScreen
 import com.aurora.store.compose.ui.dev.DevProfileScreen
+import com.aurora.store.compose.ui.dispenser.DispenserScreen
 import com.aurora.store.compose.ui.downloads.DownloadsScreen
 import com.aurora.store.compose.ui.favourite.FavouriteScreen
+import com.aurora.store.compose.ui.installed.InstalledScreen
+import com.aurora.store.compose.ui.onboarding.OnboardingScreen
+import com.aurora.store.compose.ui.preferences.installation.InstallerScreen
 import com.aurora.store.compose.ui.search.SearchScreen
+import com.aurora.store.compose.ui.spoof.SpoofScreen
 
 /**
  * Navigation display for compose screens
@@ -35,6 +40,16 @@ import com.aurora.store.compose.ui.search.SearchScreen
 @Composable
 fun NavDisplay(startDestination: NavKey) {
     val backstack = rememberNavBackStack(startDestination)
+
+    // TODO: Rework when migrating splash fragment to compose
+    val splashIntent = NavDeepLinkBuilder(LocalContext.current)
+        .setGraph(R.navigation.mobile_navigation)
+        .setDestination(R.id.splashFragment)
+        .setComponentName(MainActivity::class.java)
+        .createTaskStackBuilder()
+        .intents
+        .first()
+        .apply { addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK) }
 
     // TODO: Drop this logic once everything is in compose
     val activity = LocalActivity.current
@@ -78,7 +93,10 @@ fun NavDisplay(startDestination: NavKey) {
             }
 
             entry<Screen.PermissionRationale> { screen ->
-                PermissionRationaleScreen(onNavigateUp = ::onNavigateUp)
+                PermissionRationaleScreen(
+                    onNavigateUp = ::onNavigateUp,
+                    requiredPermissions = screen.requiredPermissions
+                )
             }
 
             entry<Screen.Downloads> {
@@ -91,16 +109,6 @@ fun NavDisplay(startDestination: NavKey) {
             }
 
             entry<Screen.Accounts> {
-                // TODO: Rework when migrating splash fragment to compose
-                val splashIntent = NavDeepLinkBuilder(LocalContext.current)
-                    .setGraph(R.navigation.mobile_navigation)
-                    .setDestination(R.id.splashFragment)
-                    .setComponentName(MainActivity::class.java)
-                    .createTaskStackBuilder()
-                    .intents
-                    .first()
-                    .apply { addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK) }
-
                 AccountsScreen(
                     onNavigateUp = ::onNavigateUp,
                     onNavigateToSplash = { activity?.startActivity(splashIntent) }
@@ -113,6 +121,34 @@ fun NavDisplay(startDestination: NavKey) {
 
             entry<Screen.Favourite> {
                 FavouriteScreen(
+                    onNavigateUp = ::onNavigateUp,
+                    onNavigateToAppDetails = { packageName ->
+                        backstack.add(Screen.AppDetails(packageName))
+                    }
+                )
+            }
+
+            entry<Screen.Onboarding> {
+                OnboardingScreen()
+            }
+
+            entry<Screen.Spoof> {
+                SpoofScreen(
+                    onNavigateUp = ::onNavigateUp,
+                    onNavigateToSplash = { activity?.startActivity(splashIntent) }
+                )
+            }
+
+            entry<Screen.Dispenser> {
+                DispenserScreen(onNavigateUp = ::onNavigateUp)
+            }
+
+            entry<Screen.Installer> {
+                InstallerScreen(onNavigateUp = ::onNavigateUp)
+            }
+
+            entry<Screen.Installed> {
+                InstalledScreen(
                     onNavigateUp = ::onNavigateUp,
                     onNavigateToAppDetails = { packageName ->
                         backstack.add(Screen.AppDetails(packageName))

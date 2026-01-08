@@ -58,6 +58,7 @@ import com.aurora.store.R
 import com.aurora.store.compose.composable.Info
 import com.aurora.store.compose.composable.TopAppBar
 import com.aurora.store.compose.preview.AppPreviewProvider
+import com.aurora.store.compose.preview.PreviewTemplate
 import com.aurora.store.data.model.AppState
 import com.aurora.store.viewmodel.details.AppDetailsViewModel
 import kotlinx.coroutines.android.awaitFrame
@@ -106,7 +107,6 @@ private fun ScreenContent(
     onRequestInstall: (versionCode: Long) -> Unit = {},
     windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo()
 ) {
-
     val coroutineScope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
     val errorMessage = stringResource(R.string.manual_download_version_error)
@@ -179,7 +179,9 @@ private fun ScreenContent(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
+                horizontalArrangement = Arrangement.spacedBy(
+                    dimensionResource(R.dimen.padding_medium)
+                )
             ) {
                 FilledTonalButton(
                     modifier = Modifier.weight(1F),
@@ -214,8 +216,10 @@ private fun ScreenContent(
 @Preview
 @Composable
 private fun ManualDownloadScreenPreview(@PreviewParameter(AppPreviewProvider::class) app: App) {
-    ScreenContent(
-        topAppBarTitle = app.displayName,
-        currentVersionCode = app.versionCode
-    )
+    PreviewTemplate {
+        ScreenContent(
+            topAppBarTitle = app.displayName,
+            currentVersionCode = app.versionCode
+        )
+    }
 }

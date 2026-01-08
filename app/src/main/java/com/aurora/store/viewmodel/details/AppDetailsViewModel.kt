@@ -12,9 +12,11 @@ import androidx.core.content.pm.PackageInfoCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aurora.Constants
+import com.aurora.extensions.TAG
 import com.aurora.extensions.requiresGMS
 import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.Review
+import com.aurora.gplayapi.data.models.datasafety.Report as DataSafetyReport
 import com.aurora.gplayapi.data.models.details.TestingProgramStatus
 import com.aurora.gplayapi.helpers.AppDetailsHelper
 import com.aurora.gplayapi.helpers.ReviewsHelper
@@ -39,6 +41,7 @@ import com.aurora.store.util.Preferences
 import com.aurora.store.util.Preferences.PREFERENCE_UPDATES_EXTENDED
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -52,8 +55,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
-import javax.inject.Inject
-import com.aurora.gplayapi.data.models.datasafety.Report as DataSafetyReport
 
 @HiltViewModel
 class AppDetailsViewModel @Inject constructor(
@@ -67,8 +68,6 @@ class AppDetailsViewModel @Inject constructor(
     private val httpClient: IHttpClient,
     private val json: Json
 ) : ViewModel() {
-
-    private val TAG = AppDetailsViewModel::class.java.simpleName
 
     private val _app = MutableStateFlow<App?>(null)
     val app = _app.asStateFlow()
@@ -233,7 +232,7 @@ class AppDetailsViewModel @Inject constructor(
                         displayName = app.displayName,
                         iconURL = app.iconArtwork.url,
                         mode = Favourite.Mode.MANUAL,
-                        added = System.currentTimeMillis(),
+                        added = System.currentTimeMillis()
                     )
                 )
             }
@@ -261,7 +260,9 @@ class AppDetailsViewModel @Inject constructor(
                 )
 
                 DownloadStatus.QUEUED -> AppState.Queued
+
                 DownloadStatus.PURCHASING -> AppState.Purchasing
+
                 else -> defaultAppState
             }
         }.launchIn(viewModelScope)
@@ -276,7 +277,6 @@ class AppDetailsViewModel @Inject constructor(
                 _featuredReviews.value = emptyList()
             }
         }
-
     }
 
     private fun fetchFavourite(packageName: String) {
@@ -345,13 +345,13 @@ class AppDetailsViewModel @Inject constructor(
             val exodusReport = json.decodeFromString<ExodusReport>(exodusObject.toString())
 
             return exodusReport.reports
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             return emptyList()
         }
     }
 
     private fun getPlexusReport(packageName: String): PlexusReport? {
-        val url = "${Constants.PLEXUS_API_URL}/${packageName}/?scores=true"
+        val url = "${Constants.PLEXUS_API_URL}/$packageName/?scores=true"
         val playResponse = httpClient.get(url, emptyMap())
         return json.decodeFromString<PlexusReport>(String(playResponse.responseBytes))
     }

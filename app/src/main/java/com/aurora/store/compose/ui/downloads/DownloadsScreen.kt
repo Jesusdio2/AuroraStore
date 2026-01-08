@@ -23,22 +23,30 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import com.aurora.extensions.emptyPagingItems
 import com.aurora.extensions.toast
+import com.aurora.gplayapi.data.models.App
 import com.aurora.store.R
+import com.aurora.store.compose.composable.ContainedLoadingIndicator
 import com.aurora.store.compose.composable.DownloadListItem
 import com.aurora.store.compose.composable.Error
-import com.aurora.store.compose.composable.ContainedLoadingIndicator
 import com.aurora.store.compose.composable.TopAppBar
-import com.aurora.extensions.emptyPagingItems
+import com.aurora.store.compose.preview.AppPreviewProvider
+import com.aurora.store.compose.preview.PreviewTemplate
 import com.aurora.store.compose.ui.downloads.menu.DownloadsMenu
 import com.aurora.store.compose.ui.downloads.menu.MenuItem
+import com.aurora.store.data.model.DownloadStatus
 import com.aurora.store.data.room.download.Download
 import com.aurora.store.viewmodel.downloads.DownloadsViewModel
+import kotlin.random.Random
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun DownloadsScreen(
@@ -171,6 +179,15 @@ private fun ScreenContent(
 
 @Preview
 @Composable
-private fun DownloadsScreenPreview() {
-    ScreenContent()
+private fun DownloadsScreenPreview(@PreviewParameter(AppPreviewProvider::class) app: App) {
+    PreviewTemplate {
+        val downloads = List(10) {
+            Download.fromApp(app).copy(
+                packageName = Random.nextInt().toString(),
+                status = DownloadStatus.entries.random()
+            )
+        }
+        val pagedDownloads = MutableStateFlow(PagingData.from(downloads)).collectAsLazyPagingItems()
+        ScreenContent(downloads = pagedDownloads)
+    }
 }

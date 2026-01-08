@@ -23,24 +23,30 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.aurora.Constants.JSON_MIME_TYPE
+import com.aurora.extensions.emptyPagingItems
 import com.aurora.extensions.toast
 import com.aurora.store.R
+import com.aurora.store.compose.composable.ContainedLoadingIndicator
 import com.aurora.store.compose.composable.Error
 import com.aurora.store.compose.composable.FavouriteListItem
-import com.aurora.store.compose.composable.ContainedLoadingIndicator
 import com.aurora.store.compose.composable.TopAppBar
-import com.aurora.extensions.emptyPagingItems
+import com.aurora.store.compose.preview.FavouritePreviewProvider
+import com.aurora.store.compose.preview.PreviewTemplate
 import com.aurora.store.compose.ui.favourite.menu.FavouriteMenu
 import com.aurora.store.compose.ui.favourite.menu.MenuItem
 import com.aurora.store.data.room.favourite.Favourite
 import com.aurora.store.viewmodel.all.FavouriteViewModel
 import java.util.Calendar
+import kotlin.random.Random
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun FavouriteScreen(
@@ -172,6 +178,15 @@ private fun ScreenContent(
 
 @Preview
 @Composable
-private fun FavouriteScreenPreview() {
-    ScreenContent()
+private fun FavouriteScreenPreview(
+    @PreviewParameter(FavouritePreviewProvider::class) favourite: Favourite
+) {
+    PreviewTemplate {
+        val favourites = List(10) {
+            favourite.copy(packageName = "${favourite.packageName}.${Random.nextInt()}")
+        }
+        val flow = MutableStateFlow(PagingData.from(favourites)).collectAsLazyPagingItems()
+
+        ScreenContent(favourites = flow)
+    }
 }

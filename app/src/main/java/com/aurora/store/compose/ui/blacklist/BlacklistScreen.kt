@@ -46,13 +46,14 @@ import com.aurora.Constants
 import com.aurora.extensions.toast
 import com.aurora.store.R
 import com.aurora.store.compose.composable.BlackListItem
+import com.aurora.store.compose.preview.PreviewTemplate
 import com.aurora.store.compose.ui.blacklist.menu.BlacklistMenu
 import com.aurora.store.compose.ui.blacklist.menu.MenuItem
 import com.aurora.store.util.PackageUtil
 import com.aurora.store.viewmodel.blacklist.BlacklistViewModel
+import java.util.Calendar
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 @Composable
 fun BlacklistScreen(onNavigateUp: () -> Unit, viewModel: BlacklistViewModel = hiltViewModel()) {
@@ -65,11 +66,11 @@ fun BlacklistScreen(onNavigateUp: () -> Unit, viewModel: BlacklistViewModel = hi
         isPackageBlacklisted = { pkgName -> pkgName in viewModel.blacklist },
         isPackageFiltered = { pkgInfo -> viewModel.isFiltered(pkgInfo) },
         onBlacklistImport = { uri ->
-            viewModel.importBlacklist(context, uri)
+            viewModel.importBlacklist(uri)
             context.toast(R.string.toast_black_import_success)
         },
         onBlacklistExport = { uri ->
-            viewModel.exportBlacklist(context, uri)
+            viewModel.exportBlacklist(uri)
             context.toast(R.string.toast_black_export_success)
         },
         onBlacklist = { packageName -> viewModel.blacklist(packageName) },
@@ -131,7 +132,9 @@ private fun ScreenContent(
         BlacklistMenu { menuItem ->
             when (menuItem) {
                 MenuItem.SELECT_ALL -> onBlacklistAll()
+
                 MenuItem.REMOVE_ALL -> onWhitelistAll()
+
                 MenuItem.IMPORT -> {
                     docImportLauncher.launch(arrayOf(Constants.JSON_MIME_TYPE))
                 }
@@ -217,7 +220,9 @@ private fun ScreenContent(
                 val isFiltered = isPackageFiltered(pkg)
                 BlackListItem(
                     icon = PackageUtil.getIconForPackage(context, pkg.packageName)!!,
-                    displayName = pkg.applicationInfo!!.loadLabel(context.packageManager).toString(),
+                    displayName = pkg.applicationInfo!!.loadLabel(
+                        context.packageManager
+                    ).toString(),
                     packageName = pkg.packageName,
                     versionName = pkg.versionName!!,
                     versionCode = PackageInfoCompat.getLongVersionCode(pkg),
@@ -239,5 +244,7 @@ private fun ScreenContent(
 @Preview
 @Composable
 private fun BlacklistScreenPreview() {
-    ScreenContent()
+    PreviewTemplate {
+        ScreenContent()
+    }
 }

@@ -6,6 +6,7 @@
 package com.aurora.store.compose.ui.search
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,7 +35,6 @@ import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneSca
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,25 +60,24 @@ import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import coil3.compose.LocalAsyncImagePreviewHandler
+import com.aurora.extensions.emptyPagingItems
 import com.aurora.gplayapi.SearchSuggestEntry
 import com.aurora.gplayapi.data.models.App
 import com.aurora.store.R
-import com.aurora.store.compose.composable.Error
 import com.aurora.store.compose.composable.ContainedLoadingIndicator
+import com.aurora.store.compose.composable.Error
 import com.aurora.store.compose.composable.SearchSuggestionListItem
 import com.aurora.store.compose.composable.app.LargeAppListItem
 import com.aurora.store.compose.preview.AppPreviewProvider
-import com.aurora.store.compose.preview.coilPreviewProvider
-import com.aurora.extensions.emptyPagingItems
+import com.aurora.store.compose.preview.PreviewTemplate
 import com.aurora.store.compose.ui.details.AppDetailsScreen
 import com.aurora.store.data.model.SearchFilter
 import com.aurora.store.viewmodel.search.SearchViewModel
-import kotlinx.coroutines.android.awaitFrame
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 import kotlin.random.Random
+import kotlinx.coroutines.android.awaitFrame
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Composable
 fun SearchScreen(onNavigateUp: () -> Unit, viewModel: SearchViewModel = hiltViewModel()) {
@@ -104,7 +103,7 @@ private fun ScreenContent(
     onFetchSuggestions: (String) -> Unit = {},
     onSearch: (String) -> Unit = {},
     onFilter: (filter: SearchFilter) -> Unit = {},
-    isAnonymous: Boolean = true,
+    isAnonymous: Boolean = true
 ) {
     val textFieldState = rememberTextFieldState()
     val searchBarState = rememberSearchBarState()
@@ -192,7 +191,11 @@ private fun ScreenContent(
 
     @Composable
     fun ListPane() {
-        Scaffold(topBar = { SearchBar() }) { paddingValues ->
+        // TODO: https://issuetracker.google.com/issues/445720462
+        Scaffold(
+            modifier = Modifier.focusable(),
+            topBar = { SearchBar() }
+        ) { paddingValues ->
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
@@ -315,7 +318,7 @@ private fun FilterHeader(
                         contentDescription = stringResource(filter)
                     )
                 }
-            },
+            }
         )
     }
 
@@ -342,7 +345,7 @@ private fun FilterHeader(
                         painter = painterResource(R.drawable.ic_arrow_drop_down),
                         contentDescription = stringResource(filter)
                     )
-                },
+                }
             )
 
             DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
@@ -412,10 +415,9 @@ private fun FilterHeader(
 @PreviewScreenSizes
 @Composable
 private fun SearchScreenPreview(@PreviewParameter(AppPreviewProvider::class) app: App) {
-    val apps = List(10) { app.copy(id = Random.nextInt()) }
-    val results = flowOf(PagingData.from(apps)).collectAsLazyPagingItems()
-
-    CompositionLocalProvider(LocalAsyncImagePreviewHandler provides coilPreviewProvider) {
+    PreviewTemplate {
+        val apps = List(10) { app.copy(id = Random.nextInt()) }
+        val results = MutableStateFlow(PagingData.from(apps)).collectAsLazyPagingItems()
         ScreenContent(results = results)
     }
 }

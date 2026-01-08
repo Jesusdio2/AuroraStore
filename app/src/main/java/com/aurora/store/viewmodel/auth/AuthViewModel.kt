@@ -24,6 +24,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aurora.Constants
+import com.aurora.extensions.TAG
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.helpers.AuthHelper
 import com.aurora.store.AuroraApp
@@ -37,13 +38,13 @@ import com.aurora.store.util.AC2DMTask
 import com.aurora.store.util.Preferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.net.ConnectException
+import java.net.UnknownHostException
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.net.ConnectException
-import java.net.UnknownHostException
-import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
@@ -51,8 +52,6 @@ class AuthViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val aC2DMTask: AC2DMTask
 ) : ViewModel() {
-
-    private val TAG = AuthViewModel::class.java.simpleName
 
     private val _authState: MutableStateFlow<AuthState> = MutableStateFlow(AuthState.Init)
     val authState = _authState.asStateFlow()
@@ -136,6 +135,7 @@ class AuthViewModel @Inject constructor(
                 // Generate and validate new auth
                 when (AccountProvider.getAccountType(context)) {
                     AccountType.ANONYMOUS -> buildAnonymousAuthData()
+
                     AccountType.GOOGLE -> {
                         val email = AccountProvider.getLoginEmail(context)
                         val tokenPair = AccountProvider.getLoginToken(context)
@@ -150,7 +150,8 @@ class AuthViewModel @Inject constructor(
                             }
 
                             AuthHelper.Token.AUTH -> {
-                                _authState.value = AuthState.PendingAccountManager(email, tokenPair.first)
+                                _authState.value =
+                                    AuthState.PendingAccountManager(email, tokenPair.first)
                             }
                         }
                     }
