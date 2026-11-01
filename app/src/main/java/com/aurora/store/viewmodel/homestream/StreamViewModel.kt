@@ -1,20 +1,6 @@
 /*
- * Aurora Store
- *  Copyright (C) 2021, Rahul Kumar Patel <whyorean@gmail.com>
- *
- *  Aurora Store is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  Aurora Store is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Aurora Store.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * SPDX-FileCopyrightText: 2021 Aurora OSS
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 package com.aurora.store.viewmodel.homestream
@@ -72,6 +58,7 @@ class StreamViewModel @Inject constructor(
                         // Fetch new stream bundle
                         val newBundle = if (bundle.hasCluster()) {
                             streamContract.nextStreamBundle(
+                                bundle.id,
                                 category,
                                 bundle.streamNextPageUrl
                             )
@@ -79,7 +66,6 @@ class StreamViewModel @Inject constructor(
                             streamContract.fetch(type, category)
                         }
 
-                        // Update old bundle
                         val mergedBundle = bundle.copy(
                             streamClusters = bundle.streamClusters + newBundle.streamClusters,
                             streamNextPageUrl = newBundle.streamNextPageUrl
@@ -103,6 +89,7 @@ class StreamViewModel @Inject constructor(
             try {
                 if (streamCluster.hasNext()) {
                     val newCluster = streamContract.nextStreamCluster(
+                        streamCluster.id,
                         streamCluster.clusterNextPageUrl
                     )
 
@@ -134,7 +121,8 @@ class StreamViewModel @Inject constructor(
 
         val mergedCluster = oldCluster.copy(
             clusterNextPageUrl = newCluster.clusterNextPageUrl,
-            clusterAppList = oldCluster.clusterAppList + newCluster.clusterAppList
+            clusterAppList = (oldCluster.clusterAppList + newCluster.clusterAppList)
+                .distinctBy { it.packageName }
         )
 
         val updatedClusters = bundle.streamClusters.toMutableMap().apply {
@@ -158,6 +146,6 @@ class StreamViewModel @Inject constructor(
 
     private fun targetBundle(category: StreamContract.Category): StreamBundle =
         stash.getOrPut(category) {
-            StreamBundle()
+            StreamBundle(id = category.value.hashCode())
         }
 }

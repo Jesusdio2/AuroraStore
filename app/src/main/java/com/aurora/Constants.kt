@@ -1,20 +1,6 @@
 /*
- * Aurora Store
- *  Copyright (C) 2021, Rahul Kumar Patel <whyorean@gmail.com>
- *
- *  Aurora Store is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  Aurora Store is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Aurora Store.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * SPDX-FileCopyrightText: 2021 Aurora OSS
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 package com.aurora
@@ -31,21 +17,34 @@ object Constants {
     const val EXODUS_SUBMIT_PAGE = "https://reports.exodus-privacy.eu.org/analysis/submit/#"
     const val EXODUS_REPORT_URL = "https://reports.exodus-privacy.eu.org/reports/"
     const val EXODUS_SEARCH_URL = "https://reports.exodus-privacy.eu.org/api/search/"
+    const val EXODUS_TRACKERS_URL = "https://reports.exodus-privacy.eu.org/api/trackers"
 
     const val PLEXUS_API_URL = "https://plexus.techlore.tech/api/v1/apps"
     const val PLEXUS_SEARCH_URL = "https://plexus.techlore.tech/?q="
 
     const val SHARE_URL = "https://play.google.com/store/apps/details?id="
 
-    const val UPDATE_URL_STABLE = "https://gitlab.com/AuroraOSS/AuroraStore/raw/master/updates.json"
+    const val UPDATE_URL_VANILLA =
+        "https://auroraoss.com/downloads/AuroraStore/Feeds/release_feed.json"
     const val UPDATE_URL_NIGHTLY =
         "https://auroraoss.com/downloads/AuroraStore/Feeds/nightly_feed.json"
 
-    const val NOTIFICATION_CHANNEL_EXPORT = "NOTIFICATION_CHANNEL_EXPORT"
-    const val NOTIFICATION_CHANNEL_INSTALL = "NOTIFICATION_CHANNEL_INSTALL"
+    // Channel IDs carry a version suffix where the importance changed from a previous
+    // release: Android ignores importance edits on an already-created channel, so a new ID
+    // is the only way to roll out a lower importance. Retired IDs are listed in
+    // [LEGACY_NOTIFICATION_CHANNELS] so they can be deleted on next launch.
+    const val NOTIFICATION_CHANNEL_EXPORT = "NOTIFICATION_CHANNEL_EXPORT_V2"
+    const val NOTIFICATION_CHANNEL_INSTALL = "NOTIFICATION_CHANNEL_INSTALLED"
     const val NOTIFICATION_CHANNEL_DOWNLOADS = "NOTIFICATION_CHANNEL_DOWNLOADS"
     const val NOTIFICATION_CHANNEL_UPDATES = "NOTIFICATION_CHANNEL_UPDATES"
-    const val NOTIFICATION_CHANNEL_ACCOUNT = "NOTIFICATION_CHANNEL_ACCOUNT"
+    const val NOTIFICATION_CHANNEL_ALERTS = "NOTIFICATION_CHANNEL_ALERTS"
+
+    // Channels removed or superseded by a higher-versioned ID; deleted on next launch.
+    val LEGACY_NOTIFICATION_CHANNELS = listOf(
+        "NOTIFICATION_CHANNEL_EXPORT",
+        "NOTIFICATION_CHANNEL_INSTALL",
+        "NOTIFICATION_CHANNEL_ACCOUNT"
+    )
 
     const val GITLAB_URL = "https://gitlab.com/AuroraOSS/AuroraStore"
     const val URL_DISPENSER = "https://auroraoss.com/api/auth"

@@ -1,20 +1,6 @@
 /*
- * Aurora Store
- *  Copyright (C) 2021, Rahul Kumar Patel <whyorean@gmail.com>
- *
- *  Aurora Store is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  Aurora Store is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Aurora Store.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * SPDX-FileCopyrightText: 2021 Aurora OSS
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 package com.aurora.store.util
@@ -36,17 +22,21 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
+import com.aurora.Constants.FLAVOUR_PRELOAD
+import com.aurora.Constants.FLAVOUR_VANILLA
 import com.aurora.Constants.PACKAGE_NAME_APP_GALLERY
 import com.aurora.Constants.PACKAGE_NAME_GMS
 import com.aurora.Constants.PACKAGE_NAME_PLAY_STORE
 import com.aurora.extensions.isHuawei
 import com.aurora.extensions.isOAndAbove
 import com.aurora.extensions.isPAndAbove
+import com.aurora.extensions.isRAndAbove
 import com.aurora.extensions.isTAndAbove
 import com.aurora.extensions.isVAndAbove
 import com.aurora.extensions.isValidApp
 import com.aurora.store.BuildConfig
 import com.aurora.store.R
+import com.aurora.store.data.model.BuildType
 import java.util.Locale
 
 object PackageUtil {
@@ -184,6 +174,19 @@ object PackageUtil {
     }
 
     /**
+     * Build-level eligibility for Aurora Store's self-update: vanilla / preload flavors
+     * only, never debug, and never an F-Droid-signed build. Huawei is excluded by the
+     * flavor check. The user-facing toggle gates this further at runtime.
+     */
+    fun isSelfUpdateSupported(context: Context): Boolean {
+        val flavorEligible = BuildConfig.FLAVOR == FLAVOUR_VANILLA ||
+            BuildConfig.FLAVOR == FLAVOUR_PRELOAD
+        return flavorEligible &&
+            BuildType.CURRENT != BuildType.DEBUG &&
+            !CertUtil.isFDroidApp(context, BuildConfig.APPLICATION_ID)
+    }
+
+    /**
      * Confirm if MicroG bundle is installed
      * Considering the following:
      * 1. GmsCore is installed and it is a microG huawei variant
@@ -269,6 +272,28 @@ object PackageUtil {
             return secureResult == 1
         }
     }
+
+    /**
+     * Returns the installer package name that installed [packageName], or null if unknown / not
+     * installed. Uses [PackageManager.getInstallSourceInfo] on API 30+; falls back to the
+     * pre-30 deprecated API below that.
+     */
+    @Suppress("DEPRECATION")
+    fun getInstallerPackageName(context: Context, packageName: String): String? = try {
+        if (isRAndAbove) {
+            context.packageManager.getInstallSourceInfo(packageName).installingPackageName
+        } else {
+            context.packageManager.getInstallerPackageName(packageName)
+        }
+    } catch (_: PackageManager.NameNotFoundException) {
+        null
+    }
+
+    /** A package's own display label, or null when it is not installed. */
+    fun getPackageLabel(context: Context, packageName: String): String? = runCatching {
+        context.packageManager.getApplicationInfo(packageName, 0)
+            .loadLabel(context.packageManager).toString()
+    }.getOrNull()
 
     @Throws(Exception::class)
     fun getPackageInfo(context: Context, packageName: String, flags: Int = 0): PackageInfo =

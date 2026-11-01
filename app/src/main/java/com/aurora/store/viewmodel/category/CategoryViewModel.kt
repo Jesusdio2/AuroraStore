@@ -1,20 +1,6 @@
 /*
- * Aurora Store
- *  Copyright (C) 2021, Rahul Kumar Patel <whyorean@gmail.com>
- *
- *  Aurora Store is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  Aurora Store is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Aurora Store.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * SPDX-FileCopyrightText: 2021 Aurora OSS
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 package com.aurora.store.viewmodel.category
@@ -25,9 +11,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aurora.extensions.TAG
 import com.aurora.gplayapi.data.models.Category
+import com.aurora.gplayapi.exceptions.GooglePlayException
 import com.aurora.gplayapi.helpers.CategoryHelper
 import com.aurora.gplayapi.helpers.contracts.CategoryContract
+import com.aurora.store.AuroraApp
 import com.aurora.store.CategoryStash
+import com.aurora.store.data.event.AuthEvent
 import com.aurora.store.data.model.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -57,11 +46,17 @@ class CategoryViewModel @Inject constructor(
                 return@launch
             }
 
+            liveData.postValue(ViewState.Loading)
+
             try {
                 stash[type] = contract().getAllCategories(type)
                 liveData.postValue(ViewState.Success(stash))
+            } catch (exception: GooglePlayException.AuthException) {
+                Log.w(TAG, "Categories fetch returned ${exception.code}, redirecting to Splash")
+                AuroraApp.events.send(AuthEvent.SessionExpired())
             } catch (exception: Exception) {
                 Log.e(TAG, "Failed fetching list of categories", exception)
+                liveData.postValue(ViewState.Error(exception.message))
             }
         }
     }

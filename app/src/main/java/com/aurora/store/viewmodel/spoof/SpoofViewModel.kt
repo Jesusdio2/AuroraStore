@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Aurora OSS
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 package com.aurora.store.viewmodel.spoof
 
 import android.content.Context
@@ -5,6 +10,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.aurora.extensions.TAG
+import com.aurora.store.data.providers.AuthProvider
 import com.aurora.store.data.providers.NativeDeviceInfoProvider
 import com.aurora.store.data.providers.SpoofProvider
 import com.aurora.store.util.PathUtil
@@ -19,8 +25,12 @@ import kotlinx.coroutines.flow.asStateFlow
 @HiltViewModel
 class SpoofViewModel @Inject constructor(
     private val spoofProvider: SpoofProvider,
+    private val authProvider: AuthProvider,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    /** Full sign-out, clearing both the account DB rows and the legacy prefs. */
+    fun logout() = authProvider.logout()
 
     val defaultLocale: Locale = Locale.getDefault()
     val defaultProperties = NativeDeviceInfoProvider.getNativeDeviceProperties(context)
@@ -40,7 +50,7 @@ class SpoofViewModel @Inject constructor(
     fun onDeviceSelected(properties: Properties) {
         _currentDevice.value = properties
 
-        if (currentDevice == defaultProperties) {
+        if (properties == defaultProperties) {
             spoofProvider.removeSpoofDeviceProperties()
         } else {
             spoofProvider.setSpoofDeviceProperties(properties)
@@ -50,7 +60,7 @@ class SpoofViewModel @Inject constructor(
     fun onLocaleSelected(locale: Locale) {
         _currentLocale.value = locale
 
-        if (currentLocale == defaultLocale) {
+        if (locale == defaultLocale) {
             spoofProvider.removeSpoofLocale()
         } else {
             spoofProvider.setSpoofLocale(locale)

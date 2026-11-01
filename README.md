@@ -43,6 +43,29 @@ Aurora Store works exactly like a door or a browser, allowing you to log in to y
   - Review Add/Update
 - Token dispenser server is not super reliable, downtimes are expected.  
 
+## AI Usage
+
+Aurora Store is developed with the help of AI tooling. Here is what that means.
+
+**In this project**
+
+- AI assistance is used in day to day development: writing and refactoring code,
+  reviewing diffs, and drafting documentation.
+- Nothing gets merged that a maintainer has not read, understood and tested.
+  Generated code is a starting point, not a finished result.
+- Accountability does not change. Whatever ships in Aurora Store is the
+  maintainers' responsibility, no matter how it was written.
+
+**In contributions**
+
+- You are welcome to use AI tooling on your contributions. Just mention it in the
+  merge request description.
+- You are still responsible for what you send. Be ready to explain how your change
+  works, and to show that you built and tested it yourself.
+- Merge requests and issue reports that are plainly unreviewed model output (calls
+  to APIs that do not exist, unrelated changes, made up bug reports) will be closed
+  without review.
+
 ## Downloads
 
 Please only download the latest stable releases from one of these sources:
